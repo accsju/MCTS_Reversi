@@ -1,30 +1,27 @@
 import copy
 class Reversi_method:
     @staticmethod
-    #ボードを初期化してデータを取得する
     def initialize_reversi_board():
         board_status = [
             [0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0],
-            [0,0,0,1,2,0,0,0],
             [0,0,0,2,1,0,0,0],
+            [0,0,0,1,2,0,0,0],
             [0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0],
         ]
         board_setting = {
-            "player": 1, #黒先
-            "black-log": [],
-            "white-log": [],
-            "trun": 0,
+            "player": 1, 
+            "log": [],
+            "turn": 0,
             "board-status": board_status,
             "black-parent-node": 1,
             "white-parent-node": 1
         }
         return copy.deepcopy(board_setting)
     @staticmethod
-    #勝敗判定と勝敗差を取得する
     def is_winner(board_status): 
         black = 0
         white = 0
@@ -36,13 +33,12 @@ class Reversi_method:
                 if board_status[i][j] == 2:
                     white += 1
         if black == white:
-            return [ "drow" , 0] 
+            return "drow"
         if black > white:
-            return [ "black" , black - white ]
+            return "black"
         if black < white:
-            return [ "white" , white - black ]
+            return "white" 
     @staticmethod
-    #次における座標と置いた時の盤面図を返す
     def is_available_place(x, y, board_setting):
         board_status = board_setting["board-status"] 
         deep_copy_board_status = copy.deepcopy(board_setting["board-status"])
@@ -164,7 +160,6 @@ class Reversi_method:
             "inversion-disk-count": count,
             "next-board-status": deep_copy_board_status
         }
-        #is double pass check?
     @staticmethod
     def is_move(board_setting):
         board_status = board_setting["board-status"]
@@ -177,12 +172,11 @@ class Reversi_method:
                 if result["inversion-disk-count"]:
                     allowed_moves.append(1)
         if len(allowed_moves) == 0:
-            return  False # no move pattern
-        return True # can move
-    @staticmethod #ゲームが終了状態にあるか判定する
-    def is_game_end(board_setting): # Trueで試合続行,Falseで試合終了
+            return  False 
+        return True 
+    @staticmethod 
+    def is_game_end(board_setting):
         board_status = board_setting["board-status"]      
-        # annihilation check ?
         black = 0
         white = 0
         for i in range(8):
@@ -191,10 +185,9 @@ class Reversi_method:
                     black += 1
                 if board_status[i][j] == 2:
                     white += 1
-        if not black:
-            return True
-        if not white:
-            return True
+        # print(f"black: {black} | white: {white}")
+        if black == 0 or white == 0:
+           return False
         if Reversi_method.is_move(board_setting):
             return True
         if board_setting["player"] == 1:
@@ -202,11 +195,11 @@ class Reversi_method:
         elif board_setting["player"] == 2:
             board_setting["player"] = 1 
         if Reversi_method.is_move(board_setting):
-           return True
+            return True
         return False
     @staticmethod
     def next_moves_search(board_setting):
-        board_status = board_setting["board-status"]
+        board_status = board_setting["board-status"] 
         allowed_moves = []
         for i in range(8):
             for j in range(8):              
@@ -215,6 +208,6 @@ class Reversi_method:
                 result = Reversi_method.is_available_place(j, i, board_setting)
                 if result["inversion-disk-count"]:
                     allowed_moves.append(
-                        [j, i, copy.deepcopy(result["next-board-status"]), board_setting["player"]]
+                        {"next-board-status": result["next-board-status"]}
                     )
         return allowed_moves
